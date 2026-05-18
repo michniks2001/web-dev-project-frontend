@@ -53,18 +53,35 @@ body {
 }
 
 a {
-  color: inherit;
   text-decoration: none;
 }
 
+/* Don't let link inherit override button label colors */
+a:not([data-slot="button"]) {
+  color: inherit;
+}
+
+/* Dark buttons and links styled as buttons — always light text */
 button[class*="bg-slate-9"],
+button[class*="bg-slate-9"]:hover,
 button[class*="bg-zinc-9"],
+button[class*="bg-zinc-9"]:hover,
 button[class*="bg-neutral-9"],
+button[class*="bg-neutral-9"]:hover,
 button[class*="bg-black"],
+button[class*="bg-black"]:hover,
 a[class*="bg-slate-9"],
+a[class*="bg-slate-9"]:hover,
 a[class*="bg-zinc-9"],
+a[class*="bg-zinc-9"]:hover,
 a[class*="bg-neutral-9"],
-a[class*="bg-black"] {
+a[class*="bg-neutral-9"]:hover,
+a[class*="bg-black"],
+a[class*="bg-black"]:hover,
+[data-slot="button"][data-variant="default"],
+[data-slot="button"][data-variant="default"]:hover,
+a[data-slot="button"][data-variant="default"],
+a[data-slot="button"][data-variant="default"]:hover {
   color: #fff;
 }
 

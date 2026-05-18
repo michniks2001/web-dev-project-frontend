@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
 
-const backendUrl =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:4000";
+const PRODUCTION_API_ORIGIN = "https://backend-eqvv.onrender.com";
+
+const backendUrl = (
+  process.env.NEXT_PUBLIC_API_BASE_URL?.trim().replace(/\/$/, "") ||
+  (process.env.NODE_ENV === "production"
+    ? PRODUCTION_API_ORIGIN
+    : "http://localhost:4000")
+);
 
 const nextConfig: NextConfig = {
   async rewrites() {

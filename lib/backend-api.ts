@@ -72,9 +72,38 @@ async function readWithCache<T>(
 /** Live Vercel deployment — used for auth returnTo when env vars are unset. */
 export const PRODUCTION_APP_ORIGIN = "https://clarity-blue-two.vercel.app";
 
+/** Hosted Express API on Render. */
+export const PRODUCTION_API_ORIGIN = "https://backend-eqvv.onrender.com";
+
+function resolveApiBaseUrl(): string {
+  const configured = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+  if (configured) {
+    return configured.replace(/\/$/, "");
+  }
+  if (process.env.NODE_ENV === "production") {
+    return PRODUCTION_API_ORIGIN;
+  }
+  return "http://localhost:4000";
+}
+
 /** Auth0 login/logout must hit the Express server directly (not proxied). */
-export const AUTH_API_ORIGIN =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:4000";
+export const AUTH_API_ORIGIN = resolveApiBaseUrl();
+
+/** Same-origin `/api/v1` proxy only when frontend and API are both on localhost. */
+function shouldUseSameOriginApiProxy(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const apiHost = new URL(AUTH_API_ORIGIN).hostname;
+    const pageHost = window.location.hostname;
+    const apiIsLocal =
+      apiHost === "localhost" || apiHost === "127.0.0.1";
+    const pageIsLocal =
+      pageHost === "localhost" || pageHost === "127.0.0.1";
+    return apiIsLocal && pageIsLocal;
+  } catch {
+    return false;
+  }
+}
 
 /** App origin for Auth0 returnTo and post-login redirects. */
 export function getAppOrigin(): string {
@@ -120,12 +149,13 @@ export function getClientOnboardingReturnTo(): string {
 }
 
 /**
- * API calls from the browser use same-origin `/api/v1` (proxied to Express in
- * next.config.ts) so session cookies set at login are sent correctly.
+ * Local dev: browser calls same-origin `/api/v1` (rewritten to Express).
+ * Production: browser calls the Render API directly with credentials so the
+ * session cookie set at login is included (cross-site, SameSite=None).
  */
 function apiUrl(path: string): string {
   const normalized = path.startsWith("/") ? path : `/${path}`;
-  if (typeof window !== "undefined") {
+  if (typeof window !== "undefined" && shouldUseSameOriginApiProxy()) {
     return normalized;
   }
   return `${AUTH_API_ORIGIN}${normalized}`;
