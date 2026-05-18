@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import Header from "./_components/Header";
 import AuthDebugPanel from "./_components/AuthDebugPanel";
@@ -35,7 +36,9 @@ export default function RootLayout({
           <main className="w-full px-4 py-8 md:px-6">
             <RoleRouteGuard>{children}</RoleRouteGuard>
           </main>
-          <AuthDebugPanel />
+          <Suspense fallback={null}>
+            <AuthDebugPanel />
+          </Suspense>
         </div>
       </body>
     </html>

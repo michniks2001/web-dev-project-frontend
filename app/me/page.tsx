@@ -355,7 +355,7 @@ export default function MePage() {
                     <p className="text-slate-600">{member.email}</p>
                     {member.title && <p className="text-slate-600">{member.title}</p>}
                   </div>
-                  {session.data.user.firmMember?.id !== member.id && (
+                  {session.data.user?.firmMember?.id !== member.id && (
                     <button
                       type="button"
                       onClick={() => removeTeamMember(member.id)}
