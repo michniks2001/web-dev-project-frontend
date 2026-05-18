@@ -1,0 +1,73 @@
+<svg width="1200" height="320" viewBox="0 0 1200 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Clarity Wordmark</title>
+  <desc id="desc">A clean Clarity wordmark with collaborative connection details surrounding the text.</desc>
+
+  <defs>
+    <linearGradient id="wordGradient" x1="190" y1="110" x2="850" y2="235" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A"/>
+      <stop offset="0.55" stop-color="#1E3A8A"/>
+      <stop offset="1" stop-color="#4C1D95"/>
+    </linearGradient>
+
+    <linearGradient id="connectionGradient" x1="152" y1="70" x2="970" y2="245" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/>
+      <stop offset="0.5" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+
+    <filter id="softGlow" x="60" y="20" width="1050" height="280" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.149 0 0 0 0 0.388 0 0 0 0 0.922 0 0 0 0.18 0"/>
+      <feBlend in="SourceGraphic" mode="normal"/>
+    </filter>
+  </defs>
+
+  <!-- Collaborative connection paths -->
+  <g opacity="0.9">
+    <path d="M168 114 C260 52, 396 66, 486 124 C595 194, 690 208, 808 142 C872 106, 932 102, 1006 134"
+          stroke="url(#connectionGradient)" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.38"/>
+    <path d="M205 232 C314 268, 438 246, 525 194 C625 134, 743 122, 842 179 C898 211, 948 222, 1016 202"
+          stroke="url(#connectionGradient)" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.42"/>
+  </g>
+
+  <!-- Collaboration nodes -->
+  <g filter="url(#softGlow)">
+    <circle cx="168" cy="114" r="13" fill="#E0F2FE"/>
+    <circle cx="168" cy="114" r="6.5" fill="#0284C7"/>
+
+    <circle cx="486" cy="124" r="11" fill="#DBEAFE"/>
+    <circle cx="486" cy="124" r="5.5" fill="#2563EB"/>
+
+    <circle cx="808" cy="142" r="11" fill="#EDE9FE"/>
+    <circle cx="808" cy="142" r="5.5" fill="#7C3AED"/>
+
+    <circle cx="1006" cy="134" r="13" fill="#F3E8FF"/>
+    <circle cx="1006" cy="134" r="6.5" fill="#7C3AED"/>
+
+    <circle cx="205" cy="232" r="10" fill="#E0F2FE"/>
+    <circle cx="205" cy="232" r="5" fill="#38BDF8"/>
+
+    <circle cx="525" cy="194" r="10" fill="#DBEAFE"/>
+    <circle cx="525" cy="194" r="5" fill="#2563EB"/>
+
+    <circle cx="842" cy="179" r="10" fill="#EDE9FE"/>
+    <circle cx="842" cy="179" r="5" fill="#7C3AED"/>
+
+    <circle cx="1016" cy="202" r="10" fill="#F3E8FF"/>
+    <circle cx="1016" cy="202" r="5" fill="#9333EA"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="180" y="205"
+        font-family="Inter, Avenir Next, Avenir, Helvetica Neue, Arial, sans-serif"
+        font-size="132"
+        font-weight="760"
+        letter-spacing="-5"
+        fill="url(#wordGradient)">
+    clarity
+  </text>
+
+  <!-- Clarity sparkle -->
+  <path d="M605 75 L611 95 L631 101 L611 107 L605 127 L599 107 L579 101 L599 95 Z" fill="#2563EB"/>
+  <path d="M646 82 L650 95 L663 99 L650 103 L646 116 L642 103 L629 99 L642 95 Z" fill="#7C3AED" opacity="0.88"/>
+</svg>
