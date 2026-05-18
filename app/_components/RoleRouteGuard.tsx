@@ -102,10 +102,12 @@ export default function RoleRouteGuard({
       }
     }
 
-    if (pathname === "/onboarding") {
+    if (pathname === "/onboarding" || pathname === "/login") {
       invalidateSessionCache();
     }
-    fetchSession({ forceRefresh: pathname === "/onboarding" }).then((me) => {
+    fetchSession({
+      forceRefresh: pathname === "/onboarding" || pathname === "/login",
+    }).then((me) => {
       if (cancelled) return;
 
       if (isFirmUser(me)) {

@@ -59,10 +59,12 @@ export default function Header() {
 
   useEffect(() => {
     let cancelled = false;
-    if (pathname === "/onboarding") {
+    if (pathname === "/onboarding" || pathname === "/login") {
       invalidateSessionCache();
     }
-    fetchSession({ forceRefresh: pathname === "/onboarding" }).then((data) => {
+    fetchSession({
+      forceRefresh: pathname === "/onboarding" || pathname === "/login",
+    }).then((data) => {
       if (!cancelled) setMe(data);
     });
     return () => {
