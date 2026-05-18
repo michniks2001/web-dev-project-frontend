@@ -1,3 +1,8 @@
+import {
+  PRODUCTION_API_ORIGIN,
+  resolveBackendUrl,
+} from "@/lib/server-backend-url";
+
 type ApiRequestOptions = {
   cache?: RequestCache;
 };
@@ -72,18 +77,10 @@ async function readWithCache<T>(
 /** Live Vercel deployment — used for auth returnTo when env vars are unset. */
 export const PRODUCTION_APP_ORIGIN = "https://clarity-blue-two.vercel.app";
 
-/** Hosted Express API on Render. */
-export const PRODUCTION_API_ORIGIN = "https://backend-eqvv.onrender.com";
+export { PRODUCTION_API_ORIGIN };
 
 function resolveApiBaseUrl(): string {
-  const configured = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
-  if (configured) {
-    return configured.replace(/\/$/, "");
-  }
-  if (process.env.NODE_ENV === "production") {
-    return PRODUCTION_API_ORIGIN;
-  }
-  return "http://localhost:4000";
+  return resolveBackendUrl();
 }
 
 /** Direct backend URL (SSR / server-side fetches). */
