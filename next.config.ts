@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   async rewrites() {
     return [
+      // Local-dev fallback only — production calls the backend directly.
       {
         source: "/api/v1/:path*",
         destination: `${backendUrl}/api/v1/:path*`,

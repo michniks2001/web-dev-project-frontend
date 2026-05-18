@@ -86,18 +86,20 @@ function resolveApiBaseUrl(): string {
 /** Direct backend URL (SSR / server-side fetches). */
 export const AUTH_API_ORIGIN = resolveApiBaseUrl();
 
-/** Same-origin auth paths (proxied to Express in next.config.ts). */
+/** Auth0 login/signup/logout live on the backend — link directly to Render. */
 export function authLoginPath(returnTo?: string): string {
-  if (!returnTo) return "/auth/login";
-  return `/auth/login?returnTo=${encodeURIComponent(returnTo)}`;
+  const base = `${AUTH_API_ORIGIN}/login`;
+  if (!returnTo) return base;
+  return `${base}?returnTo=${encodeURIComponent(returnTo)}`;
 }
 
 export function authSignupPath(returnTo?: string): string {
-  if (!returnTo) return "/auth/signup";
-  return `/auth/signup?returnTo=${encodeURIComponent(returnTo)}`;
+  const base = `${AUTH_API_ORIGIN}/signup`;
+  if (!returnTo) return base;
+  return `${base}?returnTo=${encodeURIComponent(returnTo)}`;
 }
 
-export const AUTH_LOGOUT_PATH = "/api/v1/logout";
+export const AUTH_LOGOUT_PATH = `${AUTH_API_ORIGIN}/api/v1/logout`;
 
 /** App origin for Auth0 returnTo and post-login redirects. */
 export function getAppOrigin(): string {
@@ -142,12 +144,14 @@ export function getClientOnboardingReturnTo(): string {
   return getOnboardingReturnTo();
 }
 
-/** Browser: same-origin `/api/v1` (rewritten to Express). SSR: direct backend URL. */
+/**
+ * All API calls go directly to the backend (Render) so the session cookie set
+ * during the Auth0 callback is sent on the same origin. In local dev frontend
+ * and backend run on different ports, so this is also a cross-origin request
+ * with credentials.
+ */
 function apiUrl(path: string): string {
   const normalized = path.startsWith("/") ? path : `/${path}`;
-  if (typeof window !== "undefined") {
-    return normalized;
-  }
   return `${AUTH_API_ORIGIN}${normalized}`;
 }
 
