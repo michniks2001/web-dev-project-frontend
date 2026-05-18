@@ -4,9 +4,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-	AUTH_API_ORIGIN,
+	authLoginPath,
+	authSignupPath,
 	getClientOnboardingReturnTo,
 	getOnboardingMe,
+	invalidateSessionCache,
 	postOnboardBuyer,
 	postOnboardFirm,
 	type OnboardingMeData,
@@ -96,6 +98,7 @@ export default function OnboardingClient() {
 
 	useEffect(() => {
 		let cancelled = false;
+		invalidateSessionCache();
 		getOnboardingMe().then((result) => {
 			if (cancelled) return;
 			setMe(result.status === 'ok' ? result.data : null);
@@ -111,8 +114,7 @@ export default function OnboardingClient() {
 	const onboardingComplete = isFirmComplete || isBuyerComplete;
 
 	const loginHref = useMemo(
-		() =>
-			`${AUTH_API_ORIGIN}/login?returnTo=${encodeURIComponent(getClientOnboardingReturnTo())}`,
+		() => authLoginPath(getClientOnboardingReturnTo()),
 		[],
 	);
 
@@ -232,12 +234,12 @@ export default function OnboardingClient() {
 						>
 							Continue with Auth0
 						</a>
-						<Link
-							href="/signup"
+						<a
+							href={authSignupPath(getClientOnboardingReturnTo())}
 							className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
 						>
 							Sign up
-						</Link>
+						</a>
 					</div>
 				</section>
 			</div>

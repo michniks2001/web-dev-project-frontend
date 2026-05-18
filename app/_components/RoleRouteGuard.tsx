@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { AUTH_API_ORIGIN, fetchSession, isBuyerUser, isFirmUser } from "@/lib/backend-api";
+import {
+  AUTH_API_ORIGIN,
+  fetchSession,
+  invalidateSessionCache,
+  isBuyerUser,
+  isFirmUser,
+} from "@/lib/backend-api";
 
 const FIRM_BLOCKED_PATHS = [
   "/",
@@ -96,7 +102,10 @@ export default function RoleRouteGuard({
       }
     }
 
-    fetchSession().then((me) => {
+    if (pathname === "/onboarding") {
+      invalidateSessionCache();
+    }
+    fetchSession({ forceRefresh: pathname === "/onboarding" }).then((me) => {
       if (cancelled) return;
 
       if (isFirmUser(me)) {

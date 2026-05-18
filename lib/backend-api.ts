@@ -86,24 +86,21 @@ function resolveApiBaseUrl(): string {
   return "http://localhost:4000";
 }
 
-/** Auth0 login/logout must hit the Express server directly (not proxied). */
+/** Direct backend URL (SSR / server-side fetches). */
 export const AUTH_API_ORIGIN = resolveApiBaseUrl();
 
-/** Same-origin `/api/v1` proxy only when frontend and API are both on localhost. */
-function shouldUseSameOriginApiProxy(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    const apiHost = new URL(AUTH_API_ORIGIN).hostname;
-    const pageHost = window.location.hostname;
-    const apiIsLocal =
-      apiHost === "localhost" || apiHost === "127.0.0.1";
-    const pageIsLocal =
-      pageHost === "localhost" || pageHost === "127.0.0.1";
-    return apiIsLocal && pageIsLocal;
-  } catch {
-    return false;
-  }
+/** Same-origin auth paths (proxied to Express in next.config.ts). */
+export function authLoginPath(returnTo?: string): string {
+  if (!returnTo) return "/auth/login";
+  return `/auth/login?returnTo=${encodeURIComponent(returnTo)}`;
 }
+
+export function authSignupPath(returnTo?: string): string {
+  if (!returnTo) return "/auth/signup";
+  return `/auth/signup?returnTo=${encodeURIComponent(returnTo)}`;
+}
+
+export const AUTH_LOGOUT_PATH = "/api/v1/logout";
 
 /** App origin for Auth0 returnTo and post-login redirects. */
 export function getAppOrigin(): string {
@@ -148,14 +145,10 @@ export function getClientOnboardingReturnTo(): string {
   return getOnboardingReturnTo();
 }
 
-/**
- * Local dev: browser calls same-origin `/api/v1` (rewritten to Express).
- * Production: browser calls the Render API directly with credentials so the
- * session cookie set at login is included (cross-site, SameSite=None).
- */
+/** Browser: same-origin `/api/v1` (rewritten to Express). SSR: direct backend URL. */
 function apiUrl(path: string): string {
   const normalized = path.startsWith("/") ? path : `/${path}`;
-  if (typeof window !== "undefined" && shouldUseSameOriginApiProxy()) {
+  if (typeof window !== "undefined") {
     return normalized;
   }
   return `${AUTH_API_ORIGIN}${normalized}`;
@@ -258,8 +251,19 @@ export async function getHealth(
   }
 }
 
+/** Clear cached session (e.g. after Auth0 redirect). */
+export function invalidateSessionCache(): void {
+  sessionCache = null;
+  sessionInFlight = null;
+}
+
 /** Convenience for components that only need data or null. */
-export async function fetchSession(): Promise<OnboardingMeData | null> {
+export async function fetchSession(options?: {
+  forceRefresh?: boolean;
+}): Promise<OnboardingMeData | null> {
+  if (options?.forceRefresh) {
+    invalidateSessionCache();
+  }
   const now = Date.now();
   if (sessionCache && now - sessionCache.fetchedAt < SESSION_CACHE_TTL_MS) {
     return sessionCache.data;

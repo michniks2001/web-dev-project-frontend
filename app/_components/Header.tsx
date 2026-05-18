@@ -5,10 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  AUTH_API_ORIGIN,
+  AUTH_LOGOUT_PATH,
+  authLoginPath,
+  authSignupPath,
   fetchSession,
   getClientOnboardingReturnTo,
   hasCompletedOnboarding,
+  invalidateSessionCache,
   isBuyerUser,
   isFirmUser,
   type OnboardingMeData,
@@ -56,7 +59,10 @@ export default function Header() {
 
   useEffect(() => {
     let cancelled = false;
-    fetchSession().then((data) => {
+    if (pathname === "/onboarding") {
+      invalidateSessionCache();
+    }
+    fetchSession({ forceRefresh: pathname === "/onboarding" }).then((data) => {
       if (!cancelled) setMe(data);
     });
     return () => {
@@ -64,17 +70,13 @@ export default function Header() {
     };
   }, [pathname]);
 
-  const logoutHref = useMemo(
-    () => `${AUTH_API_ORIGIN}/api/v1/logout`,
-    [],
-  );
+  const logoutHref = AUTH_LOGOUT_PATH;
 
   const { loginHref, signupHref } = useMemo(() => {
     const returnTo = getClientOnboardingReturnTo();
-    const encoded = encodeURIComponent(returnTo);
     return {
-      loginHref: `${AUTH_API_ORIGIN}/login?returnTo=${encoded}`,
-      signupHref: `${AUTH_API_ORIGIN}/signup?returnTo=${encoded}`,
+      loginHref: authLoginPath(returnTo),
+      signupHref: authSignupPath(returnTo),
     };
   }, []);
 

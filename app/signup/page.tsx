@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { AUTH_API_ORIGIN, getOnboardingReturnTo } from "@/lib/backend-api";
+import { authSignupPath, getOnboardingReturnTo } from "@/lib/backend-api";
 
 async function resolveReturnTo(): Promise<string> {
   try {
@@ -19,5 +19,5 @@ async function resolveReturnTo(): Promise<string> {
 
 export default async function SignupPage() {
   const returnTo = await resolveReturnTo();
-  redirect(`${AUTH_API_ORIGIN}/signup?returnTo=${encodeURIComponent(returnTo)}`);
+  redirect(authSignupPath(returnTo));
 }
