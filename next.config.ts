@@ -10,6 +10,7 @@ const backendUrl = (
 );
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   async rewrites() {
     return [
       {
