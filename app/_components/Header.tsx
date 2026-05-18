@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import {
   AUTH_API_ORIGIN,
   fetchSession,
+  getClientOnboardingReturnTo,
   hasCompletedOnboarding,
   isBuyerUser,
   isFirmUser,
@@ -69,29 +70,7 @@ export default function Header() {
   );
 
   const { loginHref, signupHref } = useMemo(() => {
-    const fallback = "http://localhost:3000/onboarding";
-    let returnTo = fallback;
-    if (typeof window !== "undefined") {
-      try {
-        const url = new URL(window.location.origin);
-        url.pathname = "/onboarding";
-        returnTo = url.toString();
-      } catch {
-        returnTo = fallback;
-      }
-    } else if (process.env.NEXT_PUBLIC_APP_URL) {
-      try {
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-        const normalized = appUrl.startsWith("http")
-          ? appUrl
-          : `http://${appUrl}`;
-        const url = new URL(normalized);
-        url.pathname = "/onboarding";
-        returnTo = url.toString();
-      } catch {
-        returnTo = fallback;
-      }
-    }
+    const returnTo = getClientOnboardingReturnTo();
     const encoded = encodeURIComponent(returnTo);
     return {
       loginHref: `${AUTH_API_ORIGIN}/login?returnTo=${encoded}`,

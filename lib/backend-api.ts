@@ -69,9 +69,55 @@ async function readWithCache<T>(
   return request;
 }
 
+/** Live Vercel deployment — used for auth returnTo when env vars are unset. */
+export const PRODUCTION_APP_ORIGIN = "https://clarity-blue-two.vercel.app";
+
 /** Auth0 login/logout must hit the Express server directly (not proxied). */
 export const AUTH_API_ORIGIN =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:4000";
+
+/** App origin for Auth0 returnTo and post-login redirects. */
+export function getAppOrigin(): string {
+  const configured = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (configured) {
+    try {
+      const normalized = configured.startsWith("http")
+        ? configured
+        : `https://${configured}`;
+      return new URL(normalized).origin;
+    } catch {
+      // fall through
+    }
+  }
+  const vercelHost = process.env.VERCEL_URL?.trim();
+  if (vercelHost) {
+    return `https://${vercelHost}`;
+  }
+  if (process.env.NODE_ENV === "production") {
+    return PRODUCTION_APP_ORIGIN;
+  }
+  return "http://localhost:3000";
+}
+
+export function getOnboardingReturnTo(): string {
+  const url = new URL(getAppOrigin());
+  url.pathname = "/onboarding";
+  url.search = "";
+  url.hash = "";
+  return url.toString();
+}
+
+/** Prefer current browser origin on the client (e.g. clarity-blue-two.vercel.app). */
+export function getClientOnboardingReturnTo(): string {
+  if (typeof window !== "undefined") {
+    const url = new URL(window.location.origin);
+    url.pathname = "/onboarding";
+    url.search = "";
+    url.hash = "";
+    return url.toString();
+  }
+  return getOnboardingReturnTo();
+}
 
 /**
  * API calls from the browser use same-origin `/api/v1` (proxied to Express in

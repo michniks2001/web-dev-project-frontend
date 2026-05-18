@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
 	AUTH_API_ORIGIN,
+	getClientOnboardingReturnTo,
 	getOnboardingMe,
 	postOnboardBuyer,
 	postOnboardFirm,
@@ -111,11 +112,7 @@ export default function OnboardingClient() {
 
 	const loginHref = useMemo(
 		() =>
-			`${AUTH_API_ORIGIN}/login?returnTo=${encodeURIComponent(
-				typeof window !== 'undefined'
-					? `${window.location.origin}/onboarding`
-					: 'http://localhost:3000/onboarding',
-			)}`,
+			`${AUTH_API_ORIGIN}/login?returnTo=${encodeURIComponent(getClientOnboardingReturnTo())}`,
 		[],
 	);
 

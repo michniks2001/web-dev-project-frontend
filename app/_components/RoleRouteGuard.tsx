@@ -79,11 +79,13 @@ export default function RoleRouteGuard({
   useEffect(() => {
     let cancelled = false;
 
-    if (typeof window !== "undefined") {
+    // Dev-only: align frontend host with API when both run on localhost (different ports).
+    if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
       try {
         const api = new URL(AUTH_API_ORIGIN);
         const appHost = window.location.hostname;
-        const apiIsLocalhost = api.hostname === "localhost" || api.hostname === "127.0.0.1";
+        const apiIsLocalhost =
+          api.hostname === "localhost" || api.hostname === "127.0.0.1";
         if (apiIsLocalhost && appHost !== api.hostname) {
           const target = `${window.location.protocol}//${api.hostname}:${window.location.port}${window.location.pathname}${window.location.search}${window.location.hash}`;
           window.location.replace(target);
