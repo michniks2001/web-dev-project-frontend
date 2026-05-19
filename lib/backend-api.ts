@@ -86,20 +86,22 @@ function resolveApiBaseUrl(): string {
 /** Direct backend URL (SSR / server-side fetches). */
 export const AUTH_API_ORIGIN = resolveApiBaseUrl();
 
-/** Auth0 login/signup/logout live on the backend — link directly to Render. */
+/**
+ * Auth0 routes are served on the Vercel origin (proxied to Express in
+ * `app/(login|signup|callback)/route.ts`) so the session cookie returned by
+ * Express is stored as a first-party cookie on the app's own domain.
+ */
 export function authLoginPath(returnTo?: string): string {
-  const base = `${AUTH_API_ORIGIN}/login`;
-  if (!returnTo) return base;
-  return `${base}?returnTo=${encodeURIComponent(returnTo)}`;
+  if (!returnTo) return "/login";
+  return `/login?returnTo=${encodeURIComponent(returnTo)}`;
 }
 
 export function authSignupPath(returnTo?: string): string {
-  const base = `${AUTH_API_ORIGIN}/signup`;
-  if (!returnTo) return base;
-  return `${base}?returnTo=${encodeURIComponent(returnTo)}`;
+  if (!returnTo) return "/signup";
+  return `/signup?returnTo=${encodeURIComponent(returnTo)}`;
 }
 
-export const AUTH_LOGOUT_PATH = `${AUTH_API_ORIGIN}/api/v1/logout`;
+export const AUTH_LOGOUT_PATH = "/api/v1/logout";
 
 /** App origin for Auth0 returnTo and post-login redirects. */
 export function getAppOrigin(): string {
@@ -145,13 +147,15 @@ export function getClientOnboardingReturnTo(): string {
 }
 
 /**
- * All API calls go directly to the backend (Render) so the session cookie set
- * during the Auth0 callback is sent on the same origin. In local dev frontend
- * and backend run on different ports, so this is also a cross-origin request
- * with credentials.
+ * Browser: same-origin `/api/v1` (rewritten to Express via `next.config.ts`)
+ * so the first-party session cookie set during the Auth0 callback is sent.
+ * SSR: direct backend URL (no browser session cookie available anyway).
  */
 function apiUrl(path: string): string {
   const normalized = path.startsWith("/") ? path : `/${path}`;
+  if (typeof window !== "undefined") {
+    return normalized;
+  }
   return `${AUTH_API_ORIGIN}${normalized}`;
 }
 
